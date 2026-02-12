@@ -6,6 +6,9 @@ from Validators import valideer_taaktitel, valideer_prioriteit
 class TaskManager:
     """Manager voor taakbeheer"""
     
+    def __init__(self, storage=None):
+        self.storage = storage
+    
     def maak_taak_aan(self, project: Project, titel: str, beschrijving: Optional[str] = None,
                      prioriteit_str: str = "normaal") -> Tuple[bool, str, Optional[Task]]:
         """
@@ -38,7 +41,15 @@ class TaskManager:
         
         # Voeg toe aan project
         if project.voeg_taak_toe(nieuwe_taak):
-            return True, f"Taak '{titel}' succesvol aangemaakt", nieuwe_taak
+            # Sla op schijf op
+            if self.storage and self.storage.sla_project_op(project):
+                return True, f"Taak '{titel}' succesvol aangemaakt", nieuwe_taak
+            elif not self.storage:
+                return True, f"Taak '{titel}' succesvol aangemaakt", nieuwe_taak
+            else:
+                # Verwijder uit project als opslaan mislukt
+                project.tasks.remove(nieuwe_taak)
+                return False, f"Taak kon niet opgeslagen worden", None
         
         return False, "Kon taak niet toevoegen", None
     
@@ -99,6 +110,11 @@ class TaskManager:
             bericht = f"Status van taak '{taaktitel}' gewijzigd naar {nieuwe_status.value}"
             if taak.is_afgerond():
                 bericht += f" (Afgerond op: {taak.afrondmoment.strftime('%Y-%m-%d %H:%M:%S')})"
+            
+            # Sla op schijf op
+            if self.storage:
+                self.storage.sla_project_op(project)
+            
             return True, bericht
         else:
             return False, f"Status kan niet gewijzigd worden van {taak.status.value} naar {nieuwe_status_str}"
@@ -123,6 +139,11 @@ class TaskManager:
             return False, "Alleen afgeronde taken kunnen verwijderd worden"
         
         project.tasks.remove(taak)
+        
+        # Sla op schijf op
+        if self.storage:
+            self.storage.sla_project_op(project)
+        
         return True, f"Taak '{taaktitel}' succesvol verwijderd"
     
     def toon_takenlijst(self, project: Project) -> str:

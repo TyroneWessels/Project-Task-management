@@ -1,13 +1,20 @@
 from typing import List, Optional, Tuple
 from Models import Project, ProjectStatus
 from Validators import valideer_projectnaam, valideer_projectsluitng
+from Storage import StorageManager
 
 
 class ProjectManager:
     """Manager voor projectbeheer"""
     
-    def __init__(self):
+    def __init__(self, storage: Optional[StorageManager] = None):
+        self.storage = storage or StorageManager()
         self.projecten: List[Project] = []
+        self._laad_projecten_van_schijf()
+    
+    def _laad_projecten_van_schijf(self):
+        """Laad alle projecten van schijf in het geheugen"""
+        self.projecten = self.storage.laad_alle_projecten()
     
     def maak_project_aan(self, naam: str, beschrijving: Optional[str] = None) -> Tuple[bool, str, Optional[Project]]:
         """
@@ -27,7 +34,14 @@ class ProjectManager:
         
         nieuw_project = Project(naam, beschrijving)
         self.projecten.append(nieuw_project)
-        return True, f"Project '{naam}' succesvol aangemaakt", nieuw_project
+        
+        # Sla op schijf op
+        if self.storage.sla_project_op(nieuw_project):
+            return True, f"Project '{naam}' succesvol aangemaakt", nieuw_project
+        else:
+            # Verwijder uit geheugen als opslaan mislukt
+            self.projecten.remove(nieuw_project)
+            return False, f"Project '{naam}' kon niet opgeslagen worden", None
     
     def zoek_project(self, naam: str) -> Optional[Project]:
         """
@@ -69,7 +83,11 @@ class ProjectManager:
             return False, bericht
         
         if project.sluit_project():
-            return True, f"Project '{projectnaam}' succesvol gesloten"
+            # Sla op schijf op
+            if self.storage.sla_project_op(project):
+                return True, f"Project '{projectnaam}' succesvol gesloten"
+            else:
+                return False, "Project kon niet opgeslagen worden"
         
         return False, "Kon project niet sluiten"
     
@@ -92,7 +110,12 @@ class ProjectManager:
             return False, "Alleen gesloten projecten kunnen verwijderd worden"
         
         self.projecten.remove(project)
-        return True, f"Project '{projectnaam}' succesvol verwijderd"
+        
+        # Verwijder van schijf
+        if self.storage.verwijder_project(projectnaam):
+            return True, f"Project '{projectnaam}' succesvol verwijderd"
+        else:
+            return False, "Project kon niet verwijderd worden"
     
     def toon_projectoverzicht(self) -> str:
         """

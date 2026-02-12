@@ -3,6 +3,7 @@
 
 from Project_manager import ProjectManager
 from Task_manager import TaskManager
+from Storage import StorageManager
 from Utils import (toon_menu, lees_invoer, lees_keuzecijfer, lees_ja_nee,
                   toon_bericht, wacht_op_enter, wis_scherm)
 
@@ -11,8 +12,9 @@ class TaskManagementApp:
     """Hoofd applicatie voor project & task management"""
     
     def __init__(self):
-        self.project_manager = ProjectManager()
-        self.task_manager = TaskManager()
+        self.storage_manager = StorageManager()
+        self.project_manager = ProjectManager(self.storage_manager)
+        self.task_manager = TaskManager(self.storage_manager)
     
     def menu_project_aanmaken(self):
         """Menu: Nieuw project aanmaken"""
