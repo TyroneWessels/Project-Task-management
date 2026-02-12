@@ -23,6 +23,7 @@ def toon_menu():
     print("7. Taken weergeven")
     print("8. Taakdetails weergeven")
     print("9. Taak verwijderen")
+    print("10. Taken filteren op status")
     print("\n0. Afsluiten")
     print("-" * 50)
 
