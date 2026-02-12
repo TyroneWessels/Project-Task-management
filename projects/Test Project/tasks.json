@@ -1,0 +1,26 @@
+[
+  {
+    "titel": "Taak Nieuw",
+    "beschrijving": "Nieuwe taak",
+    "prioriteit": "normaal",
+    "status": "nieuw",
+    "aanmaakdatum": "2026-02-12T11:40:58.729681",
+    "afrondmoment": null
+  },
+  {
+    "titel": "Taak Bezig",
+    "beschrijving": "Taak die bezig is",
+    "prioriteit": "hoog",
+    "status": "bezig",
+    "aanmaakdatum": "2026-02-12T11:40:58.730699",
+    "afrondmoment": null
+  },
+  {
+    "titel": "Taak Afgerond",
+    "beschrijving": "Taak die afgerond wordt",
+    "prioriteit": "laag",
+    "status": "afgerond",
+    "aanmaakdatum": "2026-02-12T11:40:58.731622",
+    "afrondmoment": "2026-02-12T11:40:58.734788"
+  }
+]

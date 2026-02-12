@@ -198,3 +198,48 @@ class TaskManager:
             details += f"Afgerond: {taak.afrondmoment.strftime('%Y-%m-%d %H:%M:%S')}\n"
         
         return details
+    
+    def filter_taken_op_status(self, project: Project, status_str: str) -> str:
+        """
+        Toon een overzicht van taken met een specifieke status in een project.
+        
+        Args:
+            project: Het project
+            status_str: De status om op te filteren (nieuw, bezig, afgerond)
+        
+        Returns:
+            Een geformateerde string met de gefilterde takenlijst
+        """
+        # Parse de status
+        status_mapping = {
+            'nieuw': TaskStatus.NIEUW,
+            'bezig': TaskStatus.BEZIG,
+            'afgerond': TaskStatus.AFGEROND
+        }
+        
+        status_str_lower = status_str.lower()
+        
+        if status_str_lower not in status_mapping:
+            return f"Ongeldige status. Geldige statussen zijn: nieuw, bezig, afgerond"
+        
+        gefilterde_status = status_mapping[status_str_lower]
+        
+        # Filter taken op status
+        gefilterde_taken = [taak for taak in project.tasks if taak.status == gefilterde_status]
+        
+        if not gefilterde_taken:
+            return f"\n=== TAKEN MET STATUS '{status_str_lower}' IN PROJECT '{project.naam}' ===\nGeen taken gevonden"
+        
+        overzicht = f"\n=== TAKEN MET STATUS '{status_str_lower}' IN PROJECT '{project.naam}' ===\n"
+        overzicht += f"{'Titel':<30} {'Status':<10} {'Prioriteit':<10}\n"
+        overzicht += "-" * 50 + "\n"
+        
+        for taak in gefilterde_taken:
+            status_text = taak.status.value
+            prioriteit_text = taak.prioriteit.value
+            
+            overzicht += f"{taak.titel:<30} {status_text:<10} {prioriteit_text:<10}\n"
+        
+        overzicht += f"\nTotaal: {len(gefilterde_taken)} ta(a)k(en) met status '{status_str_lower}'"
+        
+        return overzicht

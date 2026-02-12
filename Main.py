@@ -219,13 +219,36 @@ class TaskManagementApp:
         
         wacht_op_enter()
     
+    def menu_taken_filteren_op_status(self):
+        """Menu: Taken filteren op status"""
+        print("\n=== TAKEN FILTEREN OP STATUS ===")
+        
+        projectnaam = lees_invoer("Projectnaam")
+        project = self.project_manager.zoek_project(projectnaam)
+        
+        if not project:
+            toon_bericht(f"Project '{projectnaam}' niet gevonden", "fout")
+            wacht_op_enter()
+            return
+        
+        print("\nGeldige statussen:")
+        print("- nieuw")
+        print("- bezig")
+        print("- afgerond")
+        
+        status = lees_invoer("Status om op te filteren")
+        
+        resultaat = self.task_manager.filter_taken_op_status(project, status)
+        print(resultaat)
+        wacht_op_enter()
+    
     def run(self):
         """Hoofd applicatielus"""
         while True:
             wis_scherm()
             toon_menu()
             
-            keuze = lees_keuzecijfer("Maak een keuze", 0, 9)
+            keuze = lees_keuzecijfer("Maak een keuze", 0, 10)
             
             if keuze == 0:
                 toon_bericht("Tot ziens!", "succes")
@@ -248,6 +271,8 @@ class TaskManagementApp:
                 self.menu_taakdetails_weergeven()
             elif keuze == 9:
                 self.menu_taak_verwijderen()
+            elif keuze == 10:
+                self.menu_taken_filteren_op_status()
 
 
 def main():
